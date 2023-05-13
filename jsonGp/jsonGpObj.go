@@ -1,6 +1,7 @@
 package jsongp
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ const (
 	_TYPE_JSONARR = "jsonObjArray"
 )
 
-type JsonGpObj struct {
+type JsongpObj struct {
 	keyToNode map[string]*jsonGpNode
 	flag      *jsonGpNode
 	head      *jsonGpNode
@@ -30,8 +31,8 @@ type jsonGpNode struct {
 	prev  *jsonGpNode
 }
 
-func GetJsonGpObj() *JsonGpObj {
-	return &JsonGpObj{
+func GetJsonGpObj() *JsongpObj {
+	return &JsongpObj{
 		keyToNode: make(map[string]*jsonGpNode),
 		flag:      nil,
 		head:      nil,
@@ -39,14 +40,18 @@ func GetJsonGpObj() *JsonGpObj {
 	}
 }
 
-func (jg *JsonGpObj) Set(key string, value any) {
+func (jg *JsongpObj) Set(key string, value any) {
 	if key == "" {
 		return
 	}
 	if value != nil {
 		tName := reflect.TypeOf(value).Name()
-		if tName == "" && reflect.TypeOf(value).Elem().Name() == "JsongpObj" {
-			return
+		if tName == "" {
+			eName := reflect.TypeOf(value).Elem().Name()
+			if eName != reflect.TypeOf(jg).Elem().Name() && eName != "JsongpObjArray" {
+				fmt.Println("a3341")
+				return
+			}
 		}
 	}
 	if _, has := jg.keyToNode[key]; has {
@@ -71,7 +76,7 @@ func (jg *JsonGpObj) Set(key string, value any) {
 	jg.keyToNode[key] = n
 }
 
-func (jg *JsonGpObj) Get(key string) any {
+func (jg *JsongpObj) Get(key string) any {
 	if _, has := jg.keyToNode[key]; !has {
 		return nil
 	}
@@ -79,7 +84,7 @@ func (jg *JsonGpObj) Get(key string) any {
 	return n.value
 }
 
-func (jg *JsonGpObj) Remove(key string) {
+func (jg *JsongpObj) Remove(key string) {
 	if _, has := jg.keyToNode[key]; !has {
 		return
 	}
@@ -110,11 +115,11 @@ func (jg *JsonGpObj) Remove(key string) {
 	delete(jg.keyToNode, key)
 }
 
-func (jg *JsonGpObj) ResetNext() {
+func (jg *JsongpObj) ResetNext() {
 	jg.flag = jg.head
 }
 
-func (jg *JsonGpObj) Stringify() string {
+func (jg *JsongpObj) Stringify() string {
 	run := jg.head
 	ans := &strings.Builder{}
 	ans.WriteRune('{')
@@ -167,9 +172,13 @@ func (jg *JsonGpObj) Stringify() string {
 			}
 		} else {
 			tName := reflect.TypeOf(run.value).Elem().Name()
-			if tName == "JsonGpObj" {
-				jg := run.value.(*JsonGpObj)
+			if tName == reflect.TypeOf(jg).Elem().Name() {
+				jg := run.value.(*JsongpObj)
 				str := jg.Stringify()
+				ans.WriteString(str)
+			} else if tName == "JsongpObjArray" {
+				ja := run.value.(*JsongpObjArray)
+				str := ja.Stringify()
 				ans.WriteString(str)
 			}
 		}
@@ -182,7 +191,7 @@ func (jg *JsonGpObj) Stringify() string {
 	return ans.String()
 }
 
-func (jg *JsonGpObj) Size() int {
+func (jg *JsongpObj) Size() int {
 	return len(jg.keyToNode)
 }
 
