@@ -1,7 +1,6 @@
 package jsongp
 
 import (
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -48,8 +47,7 @@ func (jg *JsongpObj) Set(key string, value any) {
 		tName := reflect.TypeOf(value).Name()
 		if tName == "" {
 			eName := reflect.TypeOf(value).Elem().Name()
-			if eName != reflect.TypeOf(jg).Elem().Name() && eName != "JsongpObjArray" {
-				fmt.Println("a3341")
+			if eName != "JsongpObj" && eName != "JsongpObjArray" {
 				return
 			}
 		}
