@@ -9,12 +9,14 @@ type token struct {
 	tokenType int
 }
 
+// 将json字符串解析成token数组
 func ParseTokens(jsonStr string) []*token {
 	jr := NewJsongpReader(jsonStr)
 	tokens := make([]*token, 0)
 	for jr.HasNext() {
 		cur := jr.Peek()
-		if isEmptyCh(cur) {
+		// peek一下，如果是空直接跳过
+		if isEmptyRune(cur) {
 			jr.Next()
 			continue
 		}
@@ -27,6 +29,7 @@ func ParseTokens(jsonStr string) []*token {
 	return tokens
 }
 
+// 判断当前的字符所属的token类型
 func judgeTokenType(reader *JsongpReader) *token {
 	ru := reader.Peek()
 	switch ru {
@@ -59,7 +62,7 @@ func judgeTokenType(reader *JsongpReader) *token {
 	case '-':
 		return JudgeNumber(reader)
 	default:
-		if isChNumber(ru) {
+		if isNumberRune(ru) {
 			return JudgeNumber(reader)
 		} else {
 			return nil
@@ -67,6 +70,7 @@ func judgeTokenType(reader *JsongpReader) *token {
 	}
 }
 
+// 读取bool值字符串
 func JudgeBool(reader *JsongpReader) *token {
 	if !reader.HasNext() {
 		return nil
@@ -150,7 +154,7 @@ func JudgeNumber(reader *JsongpReader) *token {
 				return nil
 			}
 		default:
-			if isChNumber(ru) && checkStatus(_NUMBER_COMMON, expect) {
+			if isNumberRune(ru) && checkStatus(_NUMBER_COMMON, expect) {
 				if checkStatus(_NUMBER_POINT_FALSE, expect) {
 					expect = _NUMBER_COMMON | _NUMBER_MULTI_ZERO | _NUMBER_POINT_FALSE
 				} else {
@@ -167,7 +171,7 @@ func JudgeNumber(reader *JsongpReader) *token {
 		reader.Next()
 	}
 	ans := sbu.String()
-	if !isChNumber(rune(ans[len(ans)-1])) {
+	if !isNumberRune(rune(ans[len(ans)-1])) {
 		return nil
 	}
 	return &token{data: ans, tokenType: _NUMBER}
@@ -235,18 +239,15 @@ func JudgeString(reader *JsongpReader) *token {
 	return nil
 }
 
-func isEscapeCh(ru rune) bool {
-	return ru == 't' || ru == 'n' || ru == '"' || ru == 'u' || ru == '\\'
-}
-
-func isEmptyCh(ru rune) bool {
+func isEmptyRune(ru rune) bool {
 	return ru == ' ' || ru == '\n' || ru == '\t'
 }
 
-func isChNumber(ru rune) bool {
+func isNumberRune(ru rune) bool {
 	return ru >= '0' && ru <= '9'
 }
 
-func checkStatus(current, target int) bool {
-	return !((current & target) == 0)
+// 检查状态是否符合预期
+func checkStatus(current, expect int) bool {
+	return !((current & expect) == 0)
 }

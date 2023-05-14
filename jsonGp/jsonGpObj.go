@@ -6,23 +6,14 @@ import (
 	"strings"
 )
 
-const (
-	_TYPE_UNKONWN = ""
-	_TYPE_STRING  = "string"
-	_TYPE_NUMBER  = "number"
-	_TYPE_BOOLEAN = "bool"
-	_TYPE_NULL    = "null"
-	_TYPE_JSONOBJ = "jsonObj"
-	_TYPE_JSONARR = "jsonObjArray"
-)
-
 type JsongpObj struct {
-	keyToNode map[string]*jsonGpNode
-	flag      *jsonGpNode
+	keyToNode map[string]*jsonGpNode // 这个map是为了加速get查询的速度
+	flag      *jsonGpNode            // 这个是为了遍历
 	head      *jsonGpNode
 	tail      *jsonGpNode
 }
 
+// json对象中真正存储键值对的节点，是一个双向链表（保持插入时的顺序）
 type jsonGpNode struct {
 	key   string
 	value any
