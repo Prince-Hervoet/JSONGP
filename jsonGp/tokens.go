@@ -4,37 +4,6 @@ import (
 	"strings"
 )
 
-const (
-	// 对象开始
-	_OBJECT_BEGIN = 10
-	// 对象结束
-	_OBJECT_END = 20
-	// 数组开始
-	_ARRAY_BEGIN = 30
-	// 数组结束
-	_ARRAY_END = 40
-	_STRING    = 50
-	_COLON     = 60
-	_COMMA     = 70
-	_BOOL      = 80
-	_NULL      = 90
-	_NUMBER    = 100
-)
-
-const (
-	// 前导零
-	_NUMBER_FIRST_ZERO = 1
-	// 正常零
-	_NUMBER_MULTI_ZERO = 2
-	// 中划线
-	_NUMBER_MINUS = 4
-	// 小数点
-	_NUMBER_POINT = 8
-	// 正常数字，不包含0
-	_NUMBER_COMMON      = 16
-	_NUMBER_POINT_FALSE = 32
-)
-
 type token struct {
 	data      string
 	tokenType int
