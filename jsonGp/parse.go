@@ -5,17 +5,16 @@ type pair struct {
 	value any
 }
 
-func ParseGrammar(tokens []*token) {
+func ParseGrammar(tokens []*token) *JsongpObj {
 	if len(tokens) == 0 {
-		return
+		return nil
 	}
 	t := tokens[0].tokenType
 	if t == _OBJECT_BEGIN {
-		jg := GetJsonGpObj()
-		action(tokens, 1)
+		return action(tokens, 1)
 	} else if t == _ARRAY_BEGIN {
 	}
-
+	return nil
 }
 
 func action(tokens []*token, index int) *JsongpObj {
